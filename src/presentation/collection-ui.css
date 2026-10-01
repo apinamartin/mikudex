@@ -267,11 +267,6 @@
   margin: 0;
 }
 
-.set-action-row .rarity-breakdown-toggle {
-  border-top: 0;
-  padding: 6px 0;
-}
-
 .set-action-row .bulk-ownership-actions {
   flex: 0 0 auto;
   align-self: flex-start;
@@ -404,7 +399,9 @@
 .rarity-symbol.hyper span:nth-child(3) { grid-column: 2; grid-row: 2; }
 
 .rarity-breakdown { margin: 10px 0; width: min(500px, 80vw); }
-.rarity-breakdown-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; border: 0; border-top: 1px solid #34353b; background: transparent; padding: 8px 0 0; color: #c4c2c8; font-size: 11px; text-align: left; }
+.rarity-breakdown-toggle { width: 100%; min-height: 32px; display: flex; justify-content: space-between; align-items: center; padding: 0 9px; border: 1px solid #303137; border-radius: 5px; background: #17181c; color: #dedce0; font: inherit; font-size: 11px; text-align: left; cursor: pointer; transition: border-color .16s, background .16s, color .16s; }
+.rarity-breakdown-toggle:hover { border-color: #515159; }
+.rarity-breakdown-toggle:focus-visible { outline: 2px solid #ee6678; outline-offset: 2px; }
 .rarity-breakdown-list { display: grid; gap: 8px; margin-top: 8px; padding: 10px; border: 1px solid #34353b; border-radius: 5px; background: #17181cf5; }
 /* One row per rarity: symbol, name, card count, ownership line and its own progress bar. */
 .rarity-breakdown-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 3px 8px; align-items: center; color: #bbb9c0; font-size: 10px; }

@@ -49,7 +49,8 @@ export function RarityBreakdown({ cards, details, isOwned }: Props) {
 
   return <div className="rarity-breakdown">
     <button className="rarity-breakdown-toggle" onClick={() => setExpanded(value => !value)} aria-expanded={expanded}>
-      <span>Missing card details</span><span>{expanded ? '⌃' : '⌄'}</span>
+      <span>Missing card details</span>
+      <span className={`filters-toggle-arrow ${expanded ? 'expanded' : ''}`} aria-hidden="true" />
     </button>
     {expanded && <div className="rarity-breakdown-list">
       {rows.map(row => {
