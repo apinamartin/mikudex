@@ -42,26 +42,12 @@
 .back-link { text-decoration: none; }
 
 .set-sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 90;
+  position: static;
+  display: contents;
   width: 100%;
-  padding: 8px clamp(18px, 3vw, 52px) 5px;
-  background: #101114f7;
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid #2b2c32;
 }
 
-.set-sticky-header::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0 auto 0 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  background: #101114f7;
-  border-bottom: 1px solid #2b2c32;
-}
+.set-sticky-header::before { display: none; }
 
 .era-heading {
   width: 100%;
@@ -119,5 +105,4 @@
 
 @media (max-width: 600px) {
   .site-header { flex-basis: 60px; padding-inline: 17px; }
-  .set-sticky-header { padding: 5px 16px 6px; }
 }

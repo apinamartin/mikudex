@@ -92,7 +92,7 @@ export function BinderPage({ cards, details, total, pageSize, page, pageCount, s
 
       <div className="binder-pager">
         <button className="binder-pager-button" onClick={() => onPageChange(page - 1)} disabled={page <= 0} aria-label="Previous binder page">‹ Previous</button>
-        {pageCount <= 18
+        {pageCount <= 30
           ? <div className="binder-pager-dots" aria-hidden="true">
             {Array.from({ length: pageCount }, (_, index) => (
               <button key={index} className={`binder-dot ${index === page ? 'active' : ''}`} onClick={() => onPageChange(index)} tabIndex={-1} aria-label={`Go to page ${index + 1}`} />

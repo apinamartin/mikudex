@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import type { CardBrief, CardDetails } from '../../domain/models'
 import { TcgdexCatalog } from '../../adapters/tcgdex/TcgdexCatalog'
 import { formatCardNumber } from '../card-utils'
+import { RaritySymbol } from './RaritySymbol'
 import { ReverseHoloShine } from './ReverseHoloShine'
 
 const catalog = new TcgdexCatalog()
@@ -56,7 +57,15 @@ export function DetailedCardRow({ card, total, reverse, owned, details: supplied
       <span className="detail-check" aria-hidden="true">{owned ? '✓' : ''}</span>
       <img src={card.image ? `${card.image}/low.png` : ''} alt="" loading="lazy"/>
       {reverse && <ReverseHoloShine/>}
-      <span className="detail-primary"><strong>{card.name}</strong><small>{reverse ? 'Reverse Holo · ' : ''}{details?.rarity ?? 'Unknown rarity'}</small></span>
+      <span className="detail-primary">
+        <strong>{card.name}</strong>
+        <span className="detail-rarity">
+          {reverse
+            ? <span className="rarity-symbol reverse-holo" title="Reverse Holo" aria-label="Reverse Holo">✦</span>
+            : <RaritySymbol rarity={details?.rarity} />}
+          <small>{reverse ? 'Reverse Holo · ' : ''}{details?.rarity ?? 'Unknown rarity'}</small>
+        </span>
+      </span>
       <span className="detail-number"><small>CARD NUMBER</small><strong>{formatCardNumber(card.localId, total)}</strong></span>
       <span className="detail-price"><small>MARKET PRICE</small><strong>{loadingPrice ? 'Loading…' : priceLabel(details)}</strong></span>
     </button>

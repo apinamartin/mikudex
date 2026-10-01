@@ -36,6 +36,39 @@ function readPageSize(saved: string | null): BinderPageSize {
   return size === 12 || size === 16 ? 12 : 9
 }
 
+type GridColumnProfile = 'compact' | 'mobile' | 'tablet' | 'desktop'
+
+function gridColumnProfile(width: number): GridColumnProfile {
+  if (width <= 420) return 'compact'
+  if (width <= 600) return 'mobile'
+  if (width <= 1000) return 'tablet'
+  return 'desktop'
+}
+
+function defaultGridColumns(profile: GridColumnProfile): number {
+  if (profile === 'compact') return 3
+  if (profile === 'mobile') return 4
+  if (profile === 'tablet') return 6
+  return 8
+}
+
+function maxGridColumns(profile: GridColumnProfile): number {
+  if (profile === 'compact') return 3
+  if (profile === 'mobile') return 4
+  if (profile === 'tablet') return 6
+  return 8
+}
+
+function readGridColumns(width: number): number {
+  const profile = gridColumnProfile(width)
+  const key = `mikudex.grid-columns.${profile}`
+  const saved = localStorage.getItem(key) ?? (profile === 'desktop' ? localStorage.getItem('mikudex.grid-columns') : null)
+  const columns = Number(saved)
+  return Number.isInteger(columns) && columns >= 2
+    ? Math.min(columns, maxGridColumns(profile))
+    : defaultGridColumns(profile)
+}
+
 type Props = {
   cardSet: CardSet
   ownership: Ownership
@@ -81,20 +114,30 @@ export function SetPage({ cardSet, ownership, onToggleOwnership, onSetOwnership 
   const [filter, setFilter] = useState<CardFilter>('all')
   const [showReverseHolos, setShowReverseHolos] = useState(() => localStorage.getItem('mikudex.show-reverse-holos') !== 'false')
   const [details, setDetails] = useState<Record<string, CardDetails>>({})
-  const [columns, setColumns] = useState(() => {
-    const saved = Number(localStorage.getItem('mikudex.grid-columns'))
-    return Number.isInteger(saved) && saved >= 3 && saved <= 10 ? saved : 8
-  })
+  const [columnProfile, setColumnProfile] = useState(() => gridColumnProfile(window.innerWidth))
+  const [columns, setColumns] = useState(() => readGridColumns(window.innerWidth))
   const [layout, setLayout] = useState<CardLayout>(() => readLayout(localStorage.getItem('mikudex.card-layout')))
   const [pageSize, setPageSize] = useState<BinderPageSize>(() => readPageSize(localStorage.getItem('mikudex.binder-page-size')))
   const [page, setPage] = useState(0)
   const [loadingDetails, setLoadingDetails] = useState(() => Boolean(cardSet.cards?.length))
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [filtersExpanded, setFiltersExpanded] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem('mikudex.grid-columns', String(columns))
-  }, [columns])
+    localStorage.setItem(`mikudex.grid-columns.${columnProfile}`, String(columns))
+  }, [columnProfile, columns])
+
+  useEffect(() => {
+    const syncGridColumns = () => {
+      const profile = gridColumnProfile(window.innerWidth)
+      setColumnProfile(profile)
+      setColumns(readGridColumns(window.innerWidth))
+    }
+
+    window.addEventListener('resize', syncGridColumns)
+    return () => window.removeEventListener('resize', syncGridColumns)
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('mikudex.card-layout', layout)
@@ -268,85 +311,97 @@ export function SetPage({ cardSet, ownership, onToggleOwnership, onSetOwnership 
           </button>
         </div>
 
-        <RarityBreakdown cards={displayCards} details={details} isOwned={isOwned} />
+        <div className={`collection-controls${filtersExpanded ? ' filters-expanded' : ''}`}>
+          <div className="progress-track"><span style={{ width: `${progress.percent}%` }} /></div>
 
-        <div className="progress-track"><span style={{ width: `${progress.percent}%` }} /></div>
-
-        <div className="set-tools">
-          {layout !== 'binder' && (
-            <div className="filter-tabs" aria-label="Filter cards">
-              {filters.map(option => (
-                <button key={option.id} className={filter === option.id ? 'filter-tab selected' : 'filter-tab'} onClick={() => changeFilter(option.id)}>
-                  {option.label}
-                  <span>
-                    {option.id === 'all'
-                      ? totalCount
-                      : option.id === 'owned'
-                        ? ownedCount
-                        : neededCount}
-                  </span>
-                </button>
-              ))}
+          <div className="view-settings">
+            <div className="layout-switch" aria-label="Card layout">
+              <button className={layout === 'grid' ? 'active' : ''} onClick={() => setLayout('grid')} aria-pressed={layout === 'grid'} title="Card grid">▦ <span>Cards</span></button>
+              <button className={layout === 'details' ? 'active' : ''} onClick={() => setLayout('details')} aria-pressed={layout === 'details'} title="Detailed rows">☷ <span>Details</span></button>
+              <button className={layout === 'binder' ? 'active' : ''} onClick={() => changeLayout('binder')} aria-pressed={layout === 'binder'} title="Card binder pages">▤ <span>Binder</span></button>
             </div>
-          )}
 
-          <label className={`tool-switch ${showReverseHolos ? 'on' : ''}`} title="Show reverse holo copies beside their normal card">
-            <input type="checkbox" checked={showReverseHolos} onChange={event => setShowReverseHolos(event.target.checked)} />
-            <span className="tool-switch-track is-holo" aria-hidden="true"><i /></span>
-            <span className="tool-switch-label">Reverse holos</span>
-          </label>
+            {layout === 'binder' && (
+              <div className="view-tools">
+                <label className={`tool-switch ${pageSize === 12 ? 'on' : ''}`} title="Off: 3 rows of 3 cards. On: 3 rows of 4 cards.">
+                  <input type="checkbox" checked={pageSize === 12} onChange={event => changePageSize(event.target.checked ? 12 : 9)} />
+                  <span className="tool-switch-track" aria-hidden="true"><i /></span>
+                  <span className="tool-switch-label">Cards per page</span>
+                  <output>{pageSize === 12 ? '3 × 4' : '3 × 3'}</output>
+                </label>
+              </div>
+            )}
 
-          <label className="card-search">
-            <span>⌕</span>
-            <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Find a card or number" aria-label="Find a card or number" />
-            <kbd>/</kbd>
-          </label>
-        </div>
-
-        <div className="view-settings">
-          <div className="layout-switch" aria-label="Card layout">
-            <button className={layout === 'grid' ? 'active' : ''} onClick={() => setLayout('grid')} aria-pressed={layout === 'grid'} title="Card grid">▦ <span>Cards</span></button>
-            <button className={layout === 'details' ? 'active' : ''} onClick={() => setLayout('details')} aria-pressed={layout === 'details'} title="Detailed rows">☷ <span>Details</span></button>
-            <button className={layout === 'binder' ? 'active' : ''} onClick={() => changeLayout('binder')} aria-pressed={layout === 'binder'} title="Card binder pages">▤ <span>Binder</span></button>
+            {layout === 'grid' && (
+              <label className="density-control">
+                <span>CARDS PER ROW</span>
+                <input type="range" min="2" max={maxGridColumns(columnProfile)} step="1" value={columns} onChange={event => setColumns(Number(event.target.value))} aria-label="Cards per row" />
+                <output>{columns}</output>
+              </label>
+            )}
           </div>
 
-          {layout === 'binder' && (
-            <div className="view-tools">
-              <div className="binder-pages" role="group" aria-label="Binder pages">
-                <button className="binder-page-step" onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 0} title="Previous page (left arrow)" aria-label="Previous binder page">‹</button>
-                <output aria-live="polite">{currentPage + 1} / {pageCount}</output>
-                <button className="binder-page-step" onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= pageCount - 1} title="Next page (right arrow)" aria-label="Next binder page">›</button>
+          <div className="filter-panel">
+            <button
+              className="filters-toggle"
+              type="button"
+              aria-expanded={filtersExpanded}
+              aria-controls="set-filter-controls"
+              onClick={() => setFiltersExpanded(expanded => !expanded)}
+            >
+              <span className={`filters-toggle-arrow ${filtersExpanded ? 'expanded' : ''}`} aria-hidden="true" />
+              <span>Filters</span>
+              <small>{filter === 'all' ? 'All cards' : filter === 'owned' ? 'Owned' : 'Needed'}</small>
+            </button>
+
+            <div className="filter-panel-content" id="set-filter-controls" hidden={!filtersExpanded}>
+              <div className="set-tools">
+            {layout !== 'binder' && (
+              <div className="filter-tabs" aria-label="Filter cards">
+                {filters.map(option => (
+                  <button key={option.id} className={filter === option.id ? 'filter-tab selected' : 'filter-tab'} onClick={() => changeFilter(option.id)}>
+                    {option.label}
+                    <span>
+                      {option.id === 'all'
+                        ? totalCount
+                        : option.id === 'owned'
+                          ? ownedCount
+                          : neededCount}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <label className={`tool-switch ${showReverseHolos ? 'on' : ''}`} title="Show reverse holo copies beside their normal card">
+              <input type="checkbox" checked={showReverseHolos} onChange={event => setShowReverseHolos(event.target.checked)} />
+              <span className="tool-switch-track is-holo" aria-hidden="true"><i /></span>
+              <span className="tool-switch-label">Reverse holos</span>
+            </label>
+
+            <label className="card-search">
+              <span>⌕</span>
+              <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Find a card or number" aria-label="Find a card or number" />
+              <kbd>/</kbd>
+            </label>
               </div>
 
-              <label className={`tool-switch ${pageSize === 12 ? 'on' : ''}`} title="Off: 3 rows of 3 cards. On: 3 rows of 4 cards.">
-                <input type="checkbox" checked={pageSize === 12} onChange={event => changePageSize(event.target.checked ? 12 : 9)} />
-                <span className="tool-switch-track" aria-hidden="true"><i /></span>
-                <span className="tool-switch-label">Cards per page</span>
-                <output>{pageSize === 12 ? '3 × 4' : '3 × 3'}</output>
-              </label>
+              <div className="set-action-row">
+                {error && <div className="error-banner">{error}</div>}
+                <RarityBreakdown cards={displayCards} details={details} isOwned={isOwned} />
+                <div className="bulk-ownership-actions" role="group" aria-label="Update all cards in this collection">
+                  <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, true)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
+                    Mark all owned
+                  </button>
+                  <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, false)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
+                    Mark all needed
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-
-          {layout === 'grid' && (
-            <label className="density-control">
-              <span>CARDS PER ROW</span>
-              <input type="range" min="3" max="10" step="1" value={columns} onChange={event => setColumns(Number(event.target.value))} aria-label="Cards per row" />
-              <output>{columns}</output>
-            </label>
-          )}
-        </div>
-
-        <div className="bulk-ownership-actions" role="group" aria-label="Update all cards in this collection">
-          <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, true)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
-            Mark all owned
-          </button>
-          <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, false)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
-            Mark all needed
-          </button>
+          </div>
         </div>
       </div>
-
-      {error && <div className="error-banner">{error}</div>}
 
       {loadingDetails ? (
         <div className="loading-message"><span className="spinner" /> Loading card details and variants from TCGdex…</div>
