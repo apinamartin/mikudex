@@ -120,6 +120,17 @@ function App() {
     })
   }
 
+  function setCollectionOwnership(ids: string[], owned: boolean) {
+    setOwnership(previous => {
+      const next = { ...previous }
+      for (const id of ids) {
+        if (owned) next[id] = 1
+        else delete next[id]
+      }
+      return next
+    })
+  }
+
   const totalCards = Object.values(ownership).reduce((sum, value) => sum + value, 0)
   const totalUnique = Object.values(ownership).filter(value => value > 0).length
 
@@ -134,6 +145,7 @@ function App() {
             cardSet={activeSet}
             ownership={ownership}
             onToggleOwnership={toggleOwnership}
+            onSetOwnership={setCollectionOwnership}
           />
         ) : routeCollection ? (
           <section className="set-page">

@@ -95,8 +95,45 @@
   font-variant-numeric: tabular-nums;
 }
 
+.bulk-ownership-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.bulk-ownership-actions button {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #393a40;
+  border-radius: 5px;
+  background: #202126;
+  color: #d7d5da;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color .16s, background .16s, color .16s;
+}
+
+.bulk-ownership-actions button:hover:not(:disabled) {
+  border-color: #e75067;
+  background: #2a2025;
+  color: #fff;
+}
+
+.bulk-ownership-actions button:focus-visible {
+  outline: 2px solid #ee6678;
+  outline-offset: 2px;
+}
+
+.bulk-ownership-actions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 600px) {
   .tool-switch { padding: 3px 8px 3px 5px; gap: 6px; }
+  .bulk-ownership-actions button { min-height: 30px; }
 }
 
 

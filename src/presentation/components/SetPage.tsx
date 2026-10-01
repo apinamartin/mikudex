@@ -40,6 +40,7 @@ type Props = {
   cardSet: CardSet
   ownership: Ownership
   onToggleOwnership: (id: string) => void
+  onSetOwnership: (ids: string[], owned: boolean) => void
 }
 
 async function loadSetDetails(cards: CardBrief[]): Promise<Record<string, CardDetails>> {
@@ -74,7 +75,7 @@ async function loadSetDetails(cards: CardBrief[]): Promise<Record<string, CardDe
   return Object.fromEntries(results.map(card => [card.id, card]))
 }
 
-export function SetPage({ cardSet, ownership, onToggleOwnership }: Props) {
+export function SetPage({ cardSet, ownership, onToggleOwnership, onSetOwnership }: Props) {
   const cardContainerRef = useRef<HTMLDivElement>(null)
   const filterPositionsRef = useRef<Map<string, DOMRect> | null>(null)
   const [filter, setFilter] = useState<CardFilter>('all')
@@ -146,6 +147,11 @@ export function SetPage({ cardSet, ownership, onToggleOwnership }: Props) {
       ...(withReverseHolos && details[card.id]?.variants?.reverse ? [{ card, reverse: true }] : []),
     ])
   }, [cardSet.cards, details, ownership, withReverseHolos])
+
+  const setOwnershipKeys = useMemo(() => (cardSet.cards ?? []).flatMap(card => {
+    const reverseId = reverseKey(card.id)
+    return [card.id, ...(details[card.id]?.variants?.reverse || ownership[reverseId] ? [reverseId] : [])]
+  }), [cardSet.cards, details, ownership])
 
   const visibleCards = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -328,6 +334,15 @@ export function SetPage({ cardSet, ownership, onToggleOwnership }: Props) {
               <output>{columns}</output>
             </label>
           )}
+        </div>
+
+        <div className="bulk-ownership-actions" role="group" aria-label="Update all cards in this collection">
+          <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, true)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
+            Mark all owned
+          </button>
+          <button type="button" onClick={() => onSetOwnership(setOwnershipKeys, false)} disabled={loadingDetails || setOwnershipKeys.length === 0}>
+            Mark all needed
+          </button>
         </div>
       </div>
 
