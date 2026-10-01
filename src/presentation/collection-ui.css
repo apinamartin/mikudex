@@ -147,8 +147,9 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: "progress progress" "views filters";
   align-items: center;
-  gap: 8px 12px;
-  padding: 7px clamp(12px, 3vw, 52px);
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 10px clamp(12px, 3vw, 52px);
   border-bottom: 1px solid #2b2c32;
   background: #101114f7;
   backdrop-filter: blur(12px);
@@ -173,6 +174,7 @@
   min-width: 0;
   gap: 10px;
   margin: 0;
+  padding-block: 4px;
 }
 
 .collection-controls .filter-panel { grid-area: filters; margin: 0; }
@@ -192,7 +194,56 @@
 }
 
 .view-settings { flex-wrap: wrap; gap: 10px; margin: 2px 0 10px; }
-.density-control { min-width: 0; margin-left: auto; }
+.density-control {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 30px;
+  margin-left: auto;
+  padding: 4px 9px;
+  border: 1px solid #303137;
+  border-radius: 6px;
+  background: #17181c;
+  color: #98979e;
+  font-size: 9px;
+  letter-spacing: .25px;
+  white-space: nowrap;
+}
+
+.density-control input {
+  appearance: none;
+  width: 112px;
+  height: 4px;
+  margin: 0;
+  border-radius: 999px;
+  background: #35363d;
+  cursor: pointer;
+}
+
+.density-control input::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #17181c;
+  border-radius: 50%;
+  background: #e75067;
+  box-shadow: 0 0 0 1px #e75067;
+}
+
+.density-control input::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  border: 2px solid #17181c;
+  border-radius: 50%;
+  background: #e75067;
+  box-shadow: 0 0 0 1px #e75067;
+}
+
+.density-control input:focus-visible {
+  outline: 2px solid #ee6678;
+  outline-offset: 5px;
+}
 
 .set-action-row {
   display: flex;
@@ -280,7 +331,7 @@
     grid-template-areas: "progress progress" "views filters" "tools tools";
     gap: 8px;
     margin: 0 -12px 8px;
-    padding: 5px 12px 3px;
+    padding: 8px 12px 6px;
   }
   .collection-controls .view-settings { display: contents; }
   .collection-controls .layout-switch { grid-area: views; justify-self: start; width: max-content; max-width: 100%; min-width: 0; }
@@ -415,9 +466,6 @@
 .card-view-enter .detail-card-row:nth-child(n + 5) { animation-delay: .1s; }
 @keyframes card-view-enter { from { opacity: 0; } to { opacity: 1; } }
 @keyframes card-item-enter { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.card-hover-preview { opacity: 0; transform: translateX(8px) scale(.98); transform-origin: right center; transition: opacity .16s ease, transform .16s ease; }
-.card-hover-preview.is-visible { opacity: 1; transform: translateX(0) scale(1); animation: tooltip-enter .16s ease-out both; }
-@keyframes tooltip-enter { from { opacity: 0; transform: translateX(8px) scale(.98); } to { opacity: 1; transform: translateX(0) scale(1); } }
 
 .card-tile {
   transition: transform .2s cubic-bezier(.2,.75,.25,1), box-shadow .2s ease, opacity .2s, filter .2s;
@@ -485,6 +533,10 @@
   max-width: none;
   margin-inline: auto;
 }
+
+.cards-scroll,
+.detail-card-list,
+.binder-view { margin-top: 16px; }
 
 .binder-shell {
   position: relative;
@@ -746,13 +798,27 @@
 }
 
 @media (max-width: 600px) {
-  .binder-shell { padding-left: 12px; }
+  .binder-shell { width: 100%; min-width: 0; padding: 8px; }
   .binder-spine,
   .binder-ring { display: none; }
-  .binder-sheet { min-width: 340px; }
-  .binder-sheet-body { padding: 12px; }
-  .binder-pocket-grid { --binder-card: clamp(76px, 26vw, 116px); gap: 9px; }
-  .binder-pocket-grid.cols-4 { --binder-card: clamp(62px, 20.5vw, 116px); gap: 7px; }
+  .binder-scroll { width: 100%; }
+  .binder-sheet { width: 100%; min-width: 0; max-width: 100%; }
+  .binder-sheet-body { padding: 8px; }
+  .binder-pocket-grid { width: 100%; --binder-card: clamp(56px, 26vw, 116px); gap: 7px; }
+  .binder-pocket-grid.cols-4 { --binder-card: clamp(48px, 20.5vw, 116px); gap: 5px; }
+  .binder-pocket { padding: 5px 5px 10px; }
+  .binder-sheet-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: 4px 8px;
+    padding: 8px 16px 10px 10px;
+    font-size: 8px;
+    letter-spacing: .5px;
+  }
+  .binder-sheet-set { grid-column: 1; grid-row: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .binder-sheet-count { grid-column: 2; grid-row: 1; justify-self: end; white-space: nowrap; }
+  .binder-sheet-page { grid-column: 1 / -1; grid-row: 2; justify-self: start; margin-left: 0; white-space: nowrap; text-align: left; }
   .binder-pager { gap: 8px; }
   .binder-pager-button { padding: 6px 8px; font-size: 10px; }
   .binder-pager-dots { gap: 1px; }

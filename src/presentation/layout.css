@@ -106,3 +106,7 @@
 @media (max-width: 600px) {
   .site-header { flex-basis: 60px; padding-inline: 17px; }
 }
+
+@media (max-width: 359px) {
+  body { min-width: 0; }
+}
