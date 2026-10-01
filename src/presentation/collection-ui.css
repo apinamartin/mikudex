@@ -1,0 +1,609 @@
+/* Shared on/off switch used by the collection tools (reverse holos, cards per page). */
+.tool-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 6px;
+  border: 1px solid #303137;
+  border-radius: 6px;
+  background: #17181c;
+  color: #98979e;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .16s, background .16s, color .16s;
+}
+
+.tool-switch:hover {
+  border-color: #45464e;
+  color: #d6d4d9;
+}
+
+.tool-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tool-switch-track {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 1px solid #3a3b43;
+  border-radius: 999px;
+  background: #24252a;
+  transition: background .18s, border-color .18s;
+}
+
+.tool-switch-track i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7f7e86;
+  transition: transform .18s cubic-bezier(.2,.75,.25,1), background .18s, box-shadow .18s;
+}
+
+.tool-switch.on {
+  border-color: #4b3038;
+  background: #201c20;
+  color: #eceaec;
+}
+
+.tool-switch.on .tool-switch-track {
+  border-color: #e75067;
+  background: #3a222a;
+}
+
+.tool-switch.on .tool-switch-track i {
+  transform: translateX(12px);
+  background: #e75067;
+  box-shadow: 0 0 7px #e7506780;
+}
+
+/* The reverse holo switch glows with the same holographic sheen as the cards themselves. */
+.tool-switch.on .tool-switch-track.is-holo i {
+  background: linear-gradient(135deg, #c9a9ff, #7fe8ff 45%, #ff9ec7);
+  box-shadow: 0 0 7px #b493ff9c;
+}
+
+.tool-switch input:focus-visible + .tool-switch-track {
+  outline: 2px solid #ee6678;
+  outline-offset: 3px;
+}
+
+.tool-switch-label {
+  letter-spacing: .2px;
+}
+
+.tool-switch output {
+  padding: 3px 6px;
+  border: 1px solid #34353b;
+  border-radius: 4px;
+  background: #1b1c20;
+  color: #eee;
+  font-size: 10px;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .tool-switch { padding: 3px 8px 3px 5px; gap: 6px; }
+}
+
+
+.cards-scroll,
+.detail-card-list {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin-inline: auto;
+}
+
+.detail-card-main {
+  min-height: 124px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.detail-card-main > img {
+  width: 78px;
+  height: 96px;
+}
+
+.rarity-badge {
+  min-width: 19px;
+  min-height: 23px;
+  justify-content: center;
+  padding: 3px 5px;
+  overflow: visible;
+}
+
+.rarity-badge .rarity-symbol,
+.rarity-badge .rarity-symbol span {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.rarity-symbol {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 22px;
+  height: 17px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: .8;
+  text-shadow: 0 1px 3px #000;
+  white-space: nowrap;
+}
+
+.rarity-symbol.common,
+.rarity-symbol.uncommon { align-items: center; }
+.rarity-symbol.uncommon { font-size: 13px; }
+.rarity-symbol.rare,
+.rarity-symbol.ace-spec,
+.rarity-symbol.illustration { font-size: 15px; }
+.rarity-symbol.ace-spec { color: #f05bba; }
+.rarity-symbol.illustration,
+.rarity-symbol.secret-art,
+.rarity-symbol.hyper { color: #f2ca63; }
+.rarity-symbol.ultra { color: #d9dce5; }
+.rarity-symbol.double span + span,
+.rarity-symbol.ultra span + span,
+.rarity-symbol.secret-art span + span { transform: translateY(-3px); }
+.rarity-symbol.hyper { display: grid; grid-template-columns: repeat(2, 10px); grid-template-rows: 8px 9px; align-items: center; width: 20px; height: 17px; }
+.rarity-symbol.hyper span:first-child { grid-column: 1 / 3; grid-row: 1; justify-self: center; }
+.rarity-symbol.hyper span:nth-child(2) { grid-column: 1; grid-row: 2; }
+.rarity-symbol.hyper span:nth-child(3) { grid-column: 2; grid-row: 2; }
+
+.rarity-breakdown { margin: 10px 0; width: min(500px, 80vw); }
+.rarity-breakdown-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; border: 0; border-top: 1px solid #34353b; background: transparent; padding: 8px 0 0; color: #c4c2c8; font-size: 11px; text-align: left; }
+.rarity-breakdown-list { display: grid; gap: 8px; margin-top: 8px; padding: 10px; border: 1px solid #34353b; border-radius: 5px; background: #17181cf5; }
+/* One row per rarity: symbol, name, card count, ownership line and its own progress bar. */
+.rarity-breakdown-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 3px 8px; align-items: center; color: #bbb9c0; font-size: 10px; }
+.rarity-breakdown-symbol { grid-column: 1; grid-row: 1 / span 2; display: flex; align-items: center; justify-content: center; }
+.rarity-breakdown-row strong { grid-column: 2; grid-row: 1; color: #ece9e7; font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rarity-breakdown-row small { grid-column: 3; grid-row: 1; color: #99979f; font-size: 10px; }
+.rarity-breakdown-counts { grid-column: 2; grid-row: 2; }
+.rarity-breakdown-row i { grid-column: 1 / 4; grid-row: 3; height: 4px; overflow: hidden; border-radius: 3px; background: #313238; }
+.rarity-breakdown-row i b { display: block; height: 100%; border-radius: inherit; background: #e75067; }
+
+/* The reverse holo row is filled with the same sheen the cards themselves show. */
+.rarity-breakdown-row.is-reverse i b { background: linear-gradient(90deg, #c9a9ff, #7fe8ff 45%, #ff9ec7); }
+.rarity-symbol.reverse-holo { color: #b493ff; font-size: 15px; }
+.rarity-symbol.unknown { color: #6b6b70; font-size: 12px; }
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .rarity-symbol.reverse-holo {
+    background: linear-gradient(135deg, #c9a9ff, #7fe8ff 45%, #ff9ec7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* Keep the collection content wide while retaining a small responsive gutter. */
+.home-page,
+.set-page {
+  padding-left: clamp(12px, 1.25vw, 24px);
+  padding-right: clamp(12px, 1.25vw, 24px);
+}
+
+/* Small readability increase for the main content controls and card metadata. */
+.tracker-app { font-size: 15px; }
+.intro-row p,
+.set-heading p { font-size: 13px; }
+.set-tile-name,
+.set-tile-progress,
+.filter-tab,
+.tool-switch,
+.card-search input { font-size: 11px; }
+.detail-primary strong { font-size: 14px; }
+.detail-number strong,
+.detail-price strong { font-size: 12px; }
+
+.detail-card-main { position: relative; }
+.card-view-enter { animation: card-view-enter .24s ease-out both; }
+.card-view-enter .card-tile,
+.card-view-enter .detail-card-row { animation: card-item-enter .28s ease-out both; }
+.card-view-enter .card-tile:nth-child(2),
+.card-view-enter .detail-card-row:nth-child(2) { animation-delay: .025s; }
+.card-view-enter .card-tile:nth-child(3),
+.card-view-enter .detail-card-row:nth-child(3) { animation-delay: .05s; }
+.card-view-enter .card-tile:nth-child(4),
+.card-view-enter .detail-card-row:nth-child(4) { animation-delay: .075s; }
+.card-view-enter .card-tile:nth-child(n + 5),
+.card-view-enter .detail-card-row:nth-child(n + 5) { animation-delay: .1s; }
+@keyframes card-view-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes card-item-enter { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.card-hover-preview { opacity: 0; transform: translateX(8px) scale(.98); transform-origin: right center; transition: opacity .16s ease, transform .16s ease; }
+.card-hover-preview.is-visible { opacity: 1; transform: translateX(0) scale(1); animation: tooltip-enter .16s ease-out both; }
+@keyframes tooltip-enter { from { opacity: 0; transform: translateX(8px) scale(.98); } to { opacity: 1; transform: translateX(0) scale(1); } }
+
+.card-tile {
+  transition: transform .2s cubic-bezier(.2,.75,.25,1), box-shadow .2s ease, opacity .2s, filter .2s;
+}
+.card-tile:hover,
+.card-tile:focus-visible {
+  transform: translateX(5px);
+  box-shadow: 0 10px 20px #0008;
+}
+.detail-card-row {
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s cubic-bezier(.2,.75,.25,1), opacity .15s;
+}
+.detail-card-row:hover,
+.detail-card-row:focus-within {
+  transform: translateX(5px);
+  box-shadow: 0 8px 18px #0006;
+}
+
+/* Reverse holo entries: a full tile / row beside the normal copy, labelled with text. */
+.card-variant-badge {
+  position: absolute;
+  z-index: 2;
+  top: 5px;
+  left: 5px;
+  border: 1px solid #ffffff3d;
+  border-radius: 3px;
+  background: linear-gradient(115deg, #2b2340f2, #1b2c3af2 45%, #3a2140f2);
+  box-shadow: 0 1px 5px #0009;
+  color: #efe8ff;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  line-height: 1;
+  padding: 3px 4px;
+  pointer-events: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.card-tile.is-reverse-holo {
+  box-shadow: inset 0 0 0 2px #b493ff5c;
+}
+
+.card-tile.is-reverse-holo:hover,
+.card-tile.is-reverse-holo:focus-visible {
+  box-shadow: inset 0 0 0 2px #c9a9ff8c, 0 10px 20px #0008;
+}
+
+.detail-card-row.is-reverse-holo {
+  border-color: #4a3c61;
+}
+
+@media (max-width: 600px) {
+  .card-variant-badge { top: 3px; left: 3px; font-size: 6px; padding: 2px 3px; }
+}
+
+.reverse-holo-shine { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; opacity: .9; mix-blend-mode: screen; filter: drop-shadow(0 0 3px #c5f8ff99); }
+.detail-card-main .reverse-holo-shine { top: 14px; bottom: 14px; left: 13px; width: 78px; height: auto; border-radius: 4px; }
+@media (max-width: 600px) { .detail-card-main .reverse-holo-shine { top: 11px; bottom: 11px; left: 10px; width: 56px; } }
+
+/* ---------- Binder view ---------- */
+.binder-view {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin-inline: auto;
+}
+
+.binder-shell {
+  position: relative;
+  display: flex;
+  padding: clamp(12px, 1.5vw, 20px) clamp(12px, 1.5vw, 20px) clamp(16px, 2vw, 24px) calc(clamp(12px, 1.5vw, 20px) + 34px);
+  border: 1px solid #303137;
+  border-radius: 14px;
+  background: linear-gradient(150deg, #24252b, #191a1f 46%, #131417);
+  box-shadow: 0 20px 44px #000000a6, inset 0 1px 0 #ffffff0a;
+}
+
+.binder-spine {
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vh, 34px);
+  background: linear-gradient(90deg, #1b1c21, #1b1c2100);
+}
+
+.binder-ring {
+  width: 22px;
+  height: clamp(48px, 8vh, 74px);
+  border: 5px solid;
+  border-color: #d2d5dc #75787f #4d5057 #9ea1a9;
+  border-radius: 12px;
+  box-shadow: 0 4px 9px #000000b8, inset 0 1px 2px #ffffff59;
+}
+
+.binder-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+/* The page-turn transform briefly overflows the box: keep panning possible but never show a bar. */
+.binder-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.binder-sheet {
+  width: fit-content;
+  min-width: 540px;
+  max-width: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  transform-origin: 0 50%;
+  border: 1px solid #36373e;
+  border-radius: 10px;
+  background: radial-gradient(120% 70% at 50% -12%, #262831, #1b1d22 58%, #17181c);
+  box-shadow: 0 12px 28px #0000008c, inset 0 1px 0 #ffffff0a;
+}
+
+.binder-sheet-body {
+  padding: clamp(12px, 1.5vw, 22px);
+}
+
+/* var() is not allowed as a repeat() count, so each binder layout gets its own track list. */
+.binder-pocket-grid {
+  --binder-card: clamp(96px, min(11.5vw, 13.5vh), 190px);
+  display: grid;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 18px);
+}
+
+.binder-pocket-grid.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, var(--binder-card)));
+}
+
+.binder-pocket-grid.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, var(--binder-card)));
+}
+
+.binder-sheet-footer {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px clamp(12px, 1.5vw, 22px) 12px;
+  border-top: 1px dashed #35363d;
+  color: #7f7e86;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.binder-sheet-set {
+  color: #c3c1c7;
+  font-weight: 600;
+}
+
+.binder-sheet-page {
+  margin-left: auto;
+  color: #f07988;
+  font-weight: 700;
+  letter-spacing: .6px;
+}
+
+.binder-pocket {
+  position: relative;
+  padding: 7px 7px 13px;
+  border: 1px solid #35363d;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #24262c, #1c1d22);
+  box-shadow: inset 0 1px 0 #ffffff0f, 0 6px 14px #00000070;
+}
+
+.binder-pocket::after {
+  content: "";
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  bottom: 5px;
+  height: 5px;
+  border-top: 1px solid #ffffff1f;
+  border-radius: 2px;
+  background: linear-gradient(#ffffff14, #ffffff05);
+  pointer-events: none;
+}
+
+.binder-pocket.is-empty {
+  background: linear-gradient(180deg, #202227, #191a1e);
+  opacity: .55;
+}
+
+.binder-pocket .card-tile {
+  border-radius: 4px;
+  box-shadow: 0 2px 6px #0000008c;
+}
+
+.binder-pocket .card-tile:hover,
+.binder-pocket .card-tile:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 22px #000000a8;
+}
+
+.binder-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.binder-pager-button {
+  padding: 7px 14px;
+  border: 1px solid #34353b;
+  border-radius: 5px;
+  background: #1b1c20;
+  color: #c6c4ca;
+  font-size: 11px;
+  transition: border-color .16s, background .16s, color .16s;
+}
+
+.binder-pager-button:hover:not(:disabled) {
+  border-color: #5a4048;
+  background: #221d21;
+  color: #fff;
+}
+
+.binder-pager-button:disabled {
+  opacity: .38;
+  cursor: default;
+}
+
+.binder-pager-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.binder-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 1px solid #3d3e45;
+  border-radius: 50%;
+  background: #202127;
+  transition: background .16s, border-color .16s, transform .16s;
+}
+
+.binder-dot:hover {
+  border-color: #7a5a63;
+}
+
+.binder-dot.active {
+  border-color: #e75067;
+  background: #e75067;
+  transform: scale(1.25);
+}
+
+.binder-pager-label {
+  color: #9a989f;
+  font-size: 10px;
+  letter-spacing: .6px;
+}
+
+/* Page stepper, shown to the left of the cards-per-page switch. */
+.binder-pages {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 3px;
+  border: 1px solid #303137;
+  border-radius: 6px;
+  background: #17181c;
+}
+
+.binder-page-step {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #34353b;
+  border-radius: 4px;
+  background: #1b1c20;
+  color: #b6b4bb;
+  font-size: 14px;
+  line-height: 1;
+  transition: border-color .16s, background .16s, color .16s;
+}
+
+.binder-page-step:hover:not(:disabled) {
+  border-color: #5a4048;
+  background: #221d21;
+  color: #fff;
+}
+
+.binder-page-step:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.binder-pages output {
+  min-width: 52px;
+  padding: 4px 6px;
+  border: 1px solid #34353b;
+  border-radius: 4px;
+  background: #1b1c20;
+  color: #eee;
+  font-size: 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Page stepper and switches share one row above the binder. */
+.view-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .binder-shell { padding-left: 12px; }
+  .binder-spine,
+  .binder-ring { display: none; }
+  .binder-sheet { min-width: 340px; }
+  .binder-sheet-body { padding: 12px; }
+  .binder-pocket-grid { --binder-card: clamp(76px, 26vw, 116px); gap: 9px; }
+  .binder-pocket-grid.cols-4 { --binder-card: clamp(62px, 20.5vw, 116px); gap: 7px; }
+  .binder-pager { gap: 9px; }
+  .view-tools { width: 100%; justify-content: space-between; }
+}
+
+@media (max-width: 600px) {
+  .detail-card-main {
+    min-height: 104px;
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+
+  .detail-card-main > img {
+    width: 56px;
+    height: 82px;
+  }
+}
+
+/* Collection title: more breathing room above and below the set name. */
+.set-heading h1 {
+  margin: 16px 0 12px;
+}
+
+/* Completion percentage sits beside the "x / y cards" count under the set name. */
+.set-heading .set-percent {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 7px;
+  border: 1px solid #4b2b33;
+  border-radius: 999px;
+  background: #392128;
+  color: #f07988;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .set-heading h1 { margin: 11px 0 8px; }
+  .set-heading .set-percent { margin-left: 5px; padding: 1px 5px; font-size: 9px; }
+}
+

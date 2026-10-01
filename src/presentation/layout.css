@@ -1,0 +1,123 @@
+.tracker-app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  max-width: none;
+  overflow: hidden;
+  padding-top: 0;
+}
+
+.site-header {
+  position: relative;
+  inset: auto;
+  z-index: 100;
+  flex: 0 0 68px;
+  width: 100%;
+  padding-inline: max(clamp(20px, 5vw, 76px), calc((100% - 1380px) / 2 + clamp(18px, 3vw, 52px)));
+}
+
+.wordmark,
+.header-total { text-decoration: none; }
+
+.tracker-app > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.home-page,
+.set-page {
+  width: 100%;
+  max-width: 1380px;
+  margin-inline: auto;
+}
+
+.set-page { min-height: 100%; }
+.back-link { text-decoration: none; }
+
+.set-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  width: 100%;
+  padding: 8px clamp(18px, 3vw, 52px) 5px;
+  background: #101114f7;
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid #2b2c32;
+}
+
+.set-sticky-header::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: #101114f7;
+  border-bottom: 1px solid #2b2c32;
+}
+
+.era-heading {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.era-heading:focus-visible {
+  outline: 2px solid #e75067;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.era-collapse-icon {
+  width: 9px;
+  height: 9px;
+  margin-right: 3px;
+  border-right: 1.5px solid #a4a2a8;
+  border-bottom: 1.5px solid #a4a2a8;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform .18s ease;
+}
+
+.era-collapse-icon.collapsed { transform: rotate(-45deg) translateY(2px); }
+
+.set-tile {
+  display: block;
+  text-decoration: none;
+}
+
+.set-logo-symbol {
+  width: 44px;
+  height: 44px;
+  max-height: 44px;
+  object-fit: contain;
+  opacity: .9;
+}
+
+.route-loading {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #99989e;
+  font-size: 12px;
+}
+
+.route-loading p { margin: 0; }
+.route-loading a { color: #e17888; }
+
+@media (max-width: 600px) {
+  .site-header { flex-basis: 60px; padding-inline: 17px; }
+  .set-sticky-header { padding: 5px 16px 6px; }
+}
